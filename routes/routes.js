@@ -1,4 +1,4 @@
-var fs = require("fs");
+var routes = require("../csvfile_process/csvfile.js");
 
 var appRouter = function(app) {
   app.get("/", function(req, res) {
@@ -6,16 +6,7 @@ var appRouter = function(app) {
   });
 
   app.post("/csv", function(req, res) {
-    fs.writeFile("./procurement.csv", "test", "utf8", function(err) {
-      if (err) {
-        console.log(
-          "Some error occured - file either not saved or corrupted file saved."
-        );
-      } else {
-        console.log("It's saved!");
-      }
-    });
-    console.log(req.body);
+    console.log(req.body);    // req.body already comes in as an ObjectLiteralnpm
     res.send(req.body);
   });
 };
