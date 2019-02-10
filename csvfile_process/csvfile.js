@@ -22,113 +22,47 @@ function processCSV(prcJSON) {
                 if (err) throw err;
                 console.log('file saved');
             });
+            
         }
         else if (obj_csv.length !== 0) {
-            console.log("In Condition 2, update existing record");
+            let map_condition = false;
             obj_csv.map(function (obj) {
+                
                 if (obj.Id == prcJSON.Id) {
+                    console.log("Entered obj= prc");
                     obj.Name = prcJSON.Name
                     obj.Sport =  prcJSON.Sport
                     const Json2csvParser = require('json2csv').Parser;
                     const fields = ['Id', 'Name', 'Sport'];
                     
                     const json2csvParser = new Json2csvParser({ fields });    
-                    const csv = json2csvParser.parse(prcJSON);
+                    const csv = json2csvParser.parse(obj_csv);
                     
                     console.log(csv);
                     fs.writeFileSync('./csvfile_process/procurement.csv', csv, function(err) {
                         if (err) throw err;
                         console.log('file saved');
                     }); 
-                }
-                else if (obj.Id != prcJSON.Id) {
-                    console.log("In Condition 3, add new id record to excel");
-                    const Json2csvParser = require('json2csv').Parser;
-                    const fields = ['Id', 'Name', 'Sport'];
-                    
-                    const json2csvParser = new Json2csvParser({ fields });
-                    const csv = json2csvParser.parse(prcJSON);
-                    
-                    console.log(csv.slice(19));
-                    fs.appendFileSync('./csvfile_process/procurement.csv', csv.slice(19), function(err) {
-                        if (err) throw err;
-                        console.log('file saved');
-                        break;
-                    });
-                }
+                    map_condition = true;
+                }                
             })
+        if (map_condition === false) {
+                console.log("In Condition 3, add new id record to excel");
+                const Json2csvParser = require('json2csv').Parser;
+                const fields = ['Id', 'Name', 'Sport'];
+                
+                const json2csvParser = new Json2csvParser({ fields });
+                const csv = json2csvParser.parse(prcJSON);
+                
+                console.log(csv.slice(19));
+                fs.appendFileSync('./csvfile_process/procurement.csv', csv.slice(19), function(err) {
+                    if (err) throw err;
+                    console.log('file saved');
+                });
+                
+            }
         }
     });
-
-    // csv().fromFile(csvFilePath).then((obj_csv) => {
-    //     if (obj_csv.length === 0) {
-    //         console.log("In Condition 1, if file empty, create new");
-
-    //         const Json2csvParser = require('json2csv').Parser;
-            
-    //         const fields = ['Id', 'Name', 'Sport'];
-            
-    //         const json2csvParser = new Json2csvParser({ fields });
-
-    //         const csv = json2csvParser.parse(prcJSON);            
-    //         console.log(csv);
-    //         fs.writeFile('./csvfile_process/procurement.csv', csv, function(err) {
-    //             if (err) throw err;
-    //             console.log('file 1 saved');
-    //         });
-    //     }
-    // });
-
-    // csv().fromFile(csvFilePath).then((obj_csv) => {
-    //     if (obj_csv.length !== 0) {
-    //         obj_csv.map(function (obj) {
-    //             if (obj.Id == prcJSON.Id) {
-    //                 console.log("In Condition 2, if record exists, then update existing");
-    //                 obj.Id = prcJSON.Id
-    //                 obj.Name = prcJSON.Name
-    //                 obj.Sport =  prcJSON.Sport
-                    
-    //             }
-    //         });
-            
-    //         const Json2csvParser = require('json2csv').Parser;
-            
-    //         const fields = ['Id', 'Name', 'Sport'];
-            
-    //         const json2csvParser = new Json2csvParser({ fields });
-
-    //         const csv = json2csvParser.parse(obj_csv);            
-    //         console.log(csv);
-    //         fs.writeFile('./csvfile_process/procurement.csv', csv, function(err) {
-    //             if (err) throw err;
-    //             console.log('file 2 saved');
-    //         });
-    //     }
-    // });
-
-    // csv().fromFile(csvFilePath).then((obj_csv) => {
-    //     if (obj_csv.length !== 0) {
-    //         obj_csv.map(function (obj) {
-    //             if (obj.Id != prcJSON.Id) {
-    //                 console.log("In Condition 3, if new record, then insert below");
-    //                 const Json2csvParser = require('json2csv').Parser;
-            
-    //                 const fields = ['Id', 'Name', 'Sport'];
-                    
-    //                 const json2csvParser = new Json2csvParser({ fields });
-        
-    //                 const csv = json2csvParser.parse(prcJSON);            
-    //                 console.log(csv);
-    //                 console.log("Second In Condition 3, if new record, then insert below");
-    //                 fs.appendFileSync('./csvfile_process/procurement.csv', csv, function(err) {
-    //                     if (err) throw err;
-    //                     console.log('In condition 3, file saved');
-    //                 });     
-    //             }
-    //         });
-    //     }
-    // });
-
 }
 
 
