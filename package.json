@@ -12,7 +12,9 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "csv": "^5.1.1",
-    "express": "^4.16.4"
+    "csvtojson": "^2.0.8",
+    "express": "^4.16.4",
+    "json2csv": "^4.3.3"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

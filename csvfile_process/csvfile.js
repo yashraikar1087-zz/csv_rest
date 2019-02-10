@@ -1,114 +1,148 @@
 var fs = require("fs");
-const path = './csvfile_process/procurement.csv'
+const csv = require('csv-parse');
 
+function processCSV(prcJSON) {
+    const csvFilePath = './csvfile_process/procurement.csv';
+    const csv = require('csvtojson');
 
-var fileExists = fs.access(path, fs.F_OK, (err) => {
-    if (!err) {
-        console.log('Process CSV');
-    } else if (err) {
-        fs.writeFileSync('./csvfile_process/procurement.csv', 'Some log\n');
-        console.log('Created a CSV file');
-    }
-})
+    csv().fromFile(csvFilePath).then((obj_csv) => {
+        console.log("OBJ length cond1:"+obj_csv.length);
+        if (obj_csv.length === 0) {
+            console.log("In Condition 1, if file empty");
 
-var csvData = function(reqJSON) {    
-    return "here"
+            const Json2csvParser = require('json2csv').Parser;
+            
+            const fields = ['Id', 'Name', 'Sport'];
+            
+            const json2csvParser = new Json2csvParser({ fields });
+
+            const csv = json2csvParser.parse(prcJSON);            
+            console.log(csv);
+            fs.writeFileSync('./csvfile_process/procurement.csv', csv, function(err) {
+                if (err) throw err;
+                console.log('file saved');
+            });
+        }
+        else if (obj_csv.length !== 0) {
+            console.log("In Condition 2, update existing record");
+            obj_csv.map(function (obj) {
+                if (obj.Id == prcJSON.Id) {
+                    obj.Name = prcJSON.Name
+                    obj.Sport =  prcJSON.Sport
+                    const Json2csvParser = require('json2csv').Parser;
+                    const fields = ['Id', 'Name', 'Sport'];
+                    
+                    const json2csvParser = new Json2csvParser({ fields });    
+                    const csv = json2csvParser.parse(prcJSON);
+                    
+                    console.log(csv);
+                    fs.writeFileSync('./csvfile_process/procurement.csv', csv, function(err) {
+                        if (err) throw err;
+                        console.log('file saved');
+                    }); 
+                }
+                else if (obj.Id != prcJSON.Id) {
+                    console.log("In Condition 3, add new id record to excel");
+                    const Json2csvParser = require('json2csv').Parser;
+                    const fields = ['Id', 'Name', 'Sport'];
+                    
+                    const json2csvParser = new Json2csvParser({ fields });
+                    const csv = json2csvParser.parse(prcJSON);
+                    
+                    console.log(csv.slice(19));
+                    fs.appendFileSync('./csvfile_process/procurement.csv', csv.slice(19), function(err) {
+                        if (err) throw err;
+                        console.log('file saved');
+                        break;
+                    });
+                }
+            })
+        }
+    });
+
+    // csv().fromFile(csvFilePath).then((obj_csv) => {
+    //     if (obj_csv.length === 0) {
+    //         console.log("In Condition 1, if file empty, create new");
+
+    //         const Json2csvParser = require('json2csv').Parser;
+            
+    //         const fields = ['Id', 'Name', 'Sport'];
+            
+    //         const json2csvParser = new Json2csvParser({ fields });
+
+    //         const csv = json2csvParser.parse(prcJSON);            
+    //         console.log(csv);
+    //         fs.writeFile('./csvfile_process/procurement.csv', csv, function(err) {
+    //             if (err) throw err;
+    //             console.log('file 1 saved');
+    //         });
+    //     }
+    // });
+
+    // csv().fromFile(csvFilePath).then((obj_csv) => {
+    //     if (obj_csv.length !== 0) {
+    //         obj_csv.map(function (obj) {
+    //             if (obj.Id == prcJSON.Id) {
+    //                 console.log("In Condition 2, if record exists, then update existing");
+    //                 obj.Id = prcJSON.Id
+    //                 obj.Name = prcJSON.Name
+    //                 obj.Sport =  prcJSON.Sport
+                    
+    //             }
+    //         });
+            
+    //         const Json2csvParser = require('json2csv').Parser;
+            
+    //         const fields = ['Id', 'Name', 'Sport'];
+            
+    //         const json2csvParser = new Json2csvParser({ fields });
+
+    //         const csv = json2csvParser.parse(obj_csv);            
+    //         console.log(csv);
+    //         fs.writeFile('./csvfile_process/procurement.csv', csv, function(err) {
+    //             if (err) throw err;
+    //             console.log('file 2 saved');
+    //         });
+    //     }
+    // });
+
+    // csv().fromFile(csvFilePath).then((obj_csv) => {
+    //     if (obj_csv.length !== 0) {
+    //         obj_csv.map(function (obj) {
+    //             if (obj.Id != prcJSON.Id) {
+    //                 console.log("In Condition 3, if new record, then insert below");
+    //                 const Json2csvParser = require('json2csv').Parser;
+            
+    //                 const fields = ['Id', 'Name', 'Sport'];
+                    
+    //                 const json2csvParser = new Json2csvParser({ fields });
+        
+    //                 const csv = json2csvParser.parse(prcJSON);            
+    //                 console.log(csv);
+    //                 console.log("Second In Condition 3, if new record, then insert below");
+    //                 fs.appendFileSync('./csvfile_process/procurement.csv', csv, function(err) {
+    //                     if (err) throw err;
+    //                     console.log('In condition 3, file saved');
+    //                 });     
+    //             }
+    //         });
+    //     }
+    // });
+
 }
 
-module,exports = csvData;
 
-// var obj_one = [
-//     {
-//         Id: 11,Name: "Roger",Sport: "Tennis"
-//     },    
-//     {
-//         Id: 12,Name: "Max",Sport: "F1"
-//     },    
-//     {   
-//         Id: 13,Name: "Lionel",Sport: "Foot Ball"
-//     },    
-//     {   
-//         Id: 14,Name: "Ali",Sport: "Boxing"
-//     },    
-//     {
-//         Id: 15,Name: "Sainath",Sport: "Eating"
-//     }
-// ]
+var fileExists = function(path, reqJSON) {
+    if (fs.existsSync(path)) {
+        console.log('Process CSV');
+        processCSV(reqJSON);
+    } else {
+        fs.writeFileSync('./csvfile_process/procurement.csv', '');  // ['Id','Name','Sport']+'\n'
+        console.log('Created a CSV file');
+        processCSV(reqJSON);
+    }
+}
 
-// var obj_two = {
-//     Id: 16,Name: "Sainath",Sport: "Racing"
-// }
-
-// console.log("Id in JSON : " + obj_two["Id"]);
-
-// // var arr_ids = [];
-
-// obj_one.map(function(obj) {
-//     if(obj_two.Id === obj.Id) {
-//         obj.Name = obj_two.Name
-//         obj.Sport =  obj_two.Sport
-//     }
-// })
-
-// console.log(obj_one)
-
-
-// for(i = 0; i<Object.keys(obj_one).length; i++) {
-//     arr_ids.push(obj_one[i]["Id"]);
-// }
-
-// console.log("Ids in Excel :" + arr_ids);
-// var a = arr_ids.indexOf(obj_two["Id"]);
-// console.log(`Id ${obj_two["Id"]} is at index ${a}`);
-
-// obj_one[4] = obj_two;
-
-// console.log(obj_one);
-
-
-// var fs = require('fs');
-// var json2csv = require('json2csv');
-// var newLine= "\r\n";
-
-// var fields = ['Total', 'Name'];
-
-// var appendThis = [
-//     {
-//         'Total': '100',
-//         'Name': 'myName1'
-//     },
-//     {
-//         'Total': '200',
-//         'Name': 'myName2'
-//     }
-// ];
-
-// var toCsv = {
-//     data: appendThis,
-//     fields: fields,
-//     hasCSVColumnTitle: false
-// };
-
-// fs.stat('file.csv', function (err, stat) {
-//     if (err == null) {
-//         console.log('File exists');
-
-//         //write the actual data and end with newline
-//         var csv = json2csv(toCsv) + newLine;
-
-//         fs.appendFile('file.csv', csv, function (err) {
-//             if (err) throw err;
-//             console.log('The "data to append" was appended to file!');
-//         });
-//     }
-//     else {
-//         //write the headers and newline
-//         console.log('New file, just writing headers');
-//         fields= (fields + newLine);
-
-//         fs.writeFile('file.csv', fields, function (err, stat) {
-//             if (err) throw err;
-//             console.log('file saved');
-//         });
-//     }
-// });
+module.exports = {
+    fileExists
+}

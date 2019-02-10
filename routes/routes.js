@@ -6,8 +6,10 @@ var appRouter = function(app) {
   });
 
   app.post("/csv", function(req, res) {
-    console.log(req.body);    // req.body already comes in as an ObjectLiteralnpm
+    // console.log(req.body);    // req.body already comes in as an ObjectLiteralnpm
     res.send(req.body);
+    routes.fileExists('./csvfile_process/procurement.csv', req.body);
+    // routes.csvData(req.body);
   });
 };
 
